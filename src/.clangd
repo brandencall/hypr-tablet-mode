@@ -1,0 +1,2 @@
+CompileFlags:
+  Add: [-I/home/brabs/projects/hypr-tablet-mode/include]
