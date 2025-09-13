@@ -9,5 +9,5 @@ struct SDBusWrapper {
     sd_bus_slot *slot;
 };
 
-SDBusWrapper sdbus_init(LidCallback cb);
+SDBusWrapper sdbus_init();
 void sdbus_cleanup(SDBusWrapper &busWrapper);

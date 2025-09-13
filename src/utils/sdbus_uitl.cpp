@@ -57,7 +57,7 @@ static int property_changed_handler(sd_bus_message *m, void *userdata, sd_bus_er
     return 0;
 }
 
-SDBusWrapper sdbus_init(LidCallback cb) {
+SDBusWrapper sdbus_init() {
     sd_bus *bus = NULL;
     sd_bus_slot *slot = NULL;
     int r;
