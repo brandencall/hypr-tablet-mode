@@ -1,5 +1,7 @@
 #include "utils/sdbus_util.h"
 #include <iostream>
+#include <thread>
+#include <unistd.h>
 
 static int property_changed_handler(sd_bus_message *m, void *userdata, sd_bus_error *ret_error) {
     const char *interface;
@@ -27,17 +29,12 @@ static int property_changed_handler(sd_bus_message *m, void *userdata, sd_bus_er
         if (strcmp(prop_name, "AccelerometerOrientation") == 0) {
             const char *orientation;
 
-            // Enter the variant
             r = sd_bus_message_enter_container(m, 'v', "s");
             if (r < 0)
                 return r;
-
-            // Read the string inside
             r = sd_bus_message_read(m, "s", &orientation);
             if (r < 0)
                 return r;
-
-            // Exit the variant container
             r = sd_bus_message_exit_container(m);
             if (r < 0)
                 return r;
@@ -57,7 +54,7 @@ static int property_changed_handler(sd_bus_message *m, void *userdata, sd_bus_er
     return 0;
 }
 
-SDBusWrapper sdbus_init() {
+SDBusWrapper sdbus_init_accel_orient() {
     sd_bus *bus = NULL;
     sd_bus_slot *slot = NULL;
     int r;
@@ -90,8 +87,20 @@ SDBusWrapper sdbus_init() {
     if (r < 0) {
         std::cerr << "Failed to add match" << '\n';
     }
-
     return {bus, slot};
+}
+
+void sdbus_start_processing_thread(sd_bus *bus, std::atomic<bool> &tablet_mode) {
+    while (true) {
+        if (!tablet_mode.load()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            continue;
+        }
+        int r = sd_bus_process(bus, NULL);
+        if (r == 0) {
+            sd_bus_wait(bus, (uint64_t)-1);
+        }
+    }
 }
 
 void sdbus_cleanup(SDBusWrapper &busWrapper) {
