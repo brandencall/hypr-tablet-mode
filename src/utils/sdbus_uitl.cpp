@@ -14,8 +14,6 @@ static int property_changed_handler(sd_bus_message *m, void *userdata, sd_bus_er
         return r;
     }
 
-    printf("Properties changed on interface: %s\n", interface);
-
     // Second argument: a{sv} dict of changed properties
     r = sd_bus_message_enter_container(m, 'a', "{sv}");
     if (r < 0)

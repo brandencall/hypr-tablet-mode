@@ -1,4 +1,5 @@
 #include "utils/hypr_util.h"
+#include <iostream>
 #include <poll.h>
 
 int connect_to_hypr() {
@@ -29,7 +30,6 @@ int connect_to_hypr() {
 
 int execute_hypr_cmd(std::string cmd) {
     int fd = connect_to_hypr();
-    std::cout << "writing command: " << cmd << '\n';
 
     int write_cmd = write(fd, cmd.c_str(), cmd.size());
     if (write_cmd < 0) {
