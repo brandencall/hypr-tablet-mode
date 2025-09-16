@@ -16,6 +16,7 @@ int main() {
     std::atomic<bool> tablet_mode{false};
 
     LibinputContextWrapper libinput_ctx = libinput_init();
+    // Start the sdbus thread
     auto dbus_ctx = sdbus_init_accel_orient();
     std::thread dbus_thread(sdbus_start_processing_thread, dbus_ctx.bus, std::ref(tablet_mode));
 
