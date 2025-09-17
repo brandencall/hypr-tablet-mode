@@ -1,4 +1,5 @@
 #include "utils/sdbus_util.h"
+#include <cstdio>
 #include <iostream>
 #include <thread>
 #include <unistd.h>
@@ -88,13 +89,12 @@ SDBusWrapper sdbus_init_accel_orient() {
     return {bus, slot};
 }
 
-void sdbus_start_processing_thread(sd_bus *bus, std::atomic<bool> &tablet_mode) {
+void sdbus_start_processing_thread(sd_bus *bus) {
     while (true) {
-        if (!tablet_mode.load()) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
-            continue;
-        }
         int r = sd_bus_process(bus, NULL);
+        if (r < 0) {
+            std::cerr << "err in the sdbus thread" << '\n';
+        }
         if (r == 0) {
             sd_bus_wait(bus, (uint64_t)-1);
         }

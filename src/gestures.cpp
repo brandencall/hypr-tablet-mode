@@ -1,6 +1,4 @@
 #include "gestures.h"
-#include <cmath>
-#include <iostream>
 
 std::map<uint32_t, Finger> active_fingers;
 

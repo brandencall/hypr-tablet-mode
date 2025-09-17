@@ -7,6 +7,7 @@
 #include <poll.h>
 #include <sys/poll.h>
 #include <unistd.h>
+#include <unordered_map>
 
 static int open_restricted(const char *path, int flags, void *user_data) {
   int fd = open(path, flags);
@@ -27,10 +28,9 @@ struct LibinputContextWrapper {
   int fd;
 };
 
-using SwitchCallback = std::function<void(bool tabletMode)>;
 
 LibinputContextWrapper libinput_init();
 
-void libinput_poll(LibinputContextWrapper &ctx, SwitchCallback cb);
+void libinput_poll(LibinputContextWrapper &ctx);
 
 void libinput_cleanup(LibinputContextWrapper &ctx);

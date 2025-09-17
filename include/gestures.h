@@ -1,8 +1,11 @@
 #pragma once
 
+#include <cmath>
 #include <cstdint>
+#include <iostream>
 #include <libinput.h>
 #include <map>
+
 struct Finger {
   double init_x, init_y;
   double last_x, last_y;

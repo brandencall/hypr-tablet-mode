@@ -11,5 +11,5 @@ struct SDBusWrapper {
 };
 
 SDBusWrapper sdbus_init_accel_orient();
-void sdbus_start_processing_thread(sd_bus *bus, std::atomic<bool> &tablet_mode);
+void sdbus_start_processing_thread(sd_bus *bus);
 void sdbus_cleanup(SDBusWrapper &busWrapper);
