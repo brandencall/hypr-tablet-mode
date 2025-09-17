@@ -55,3 +55,14 @@ int execute_hypr_cmd(std::string cmd) {
     return 1;
 }
 
+void close_window() {
+    execute_hypr_cmd("dispatch closewindow");
+}
+
+void workspace_right() {
+    execute_hypr_cmd("dispatch workspace r+1");
+}
+
+void workspace_left() {
+    execute_hypr_cmd("dispatch workspace r-1");
+}

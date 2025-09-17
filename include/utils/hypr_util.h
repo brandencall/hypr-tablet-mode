@@ -14,3 +14,6 @@ using json = nlohmann::json;
 
 int connect_to_hypr();
 int execute_hypr_cmd(std::string cmd);
+void close_window();
+void workspace_right();
+void workspace_left();
