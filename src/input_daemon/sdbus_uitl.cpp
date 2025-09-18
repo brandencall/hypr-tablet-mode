@@ -1,7 +1,6 @@
-#include "utils/sdbus_util.h"
+#include "input_daemon/sdbus_util.h"
 #include <cstdio>
 #include <iostream>
-#include <thread>
 #include <unistd.h>
 
 static int property_changed_handler(sd_bus_message *m, void *userdata, sd_bus_error *ret_error) {
@@ -38,6 +37,7 @@ static int property_changed_handler(sd_bus_message *m, void *userdata, sd_bus_er
             if (r < 0)
                 return r;
 
+            // TODO: implement the ipc socket write for orientation change
             printf("Orientation changed: %s\n", orientation);
         } else {
             // Skip other properties

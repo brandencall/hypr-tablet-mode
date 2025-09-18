@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <unordered_map>
 
+
 static int open_restricted(const char *path, int flags, void *user_data) {
   int fd = open(path, flags);
   if (fd < 0)
@@ -28,9 +29,8 @@ struct LibinputContextWrapper {
   int fd;
 };
 
-
 LibinputContextWrapper libinput_init();
 
-void libinput_poll(LibinputContextWrapper &ctx);
+int libinput_poll(LibinputContextWrapper &ctx, int client_socket);
 
 void libinput_cleanup(LibinputContextWrapper &ctx);

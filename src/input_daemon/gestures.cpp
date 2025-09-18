@@ -1,5 +1,5 @@
-#include "gestures.h"
-#include "utils/hypr_util.h"
+#include "input_daemon/gestures.h"
+#include "ipc/socket_server.h"
 #include <iostream>
 
 std::map<uint32_t, Finger> active_fingers;
@@ -34,23 +34,28 @@ void handle_touch_motion_event(libinput_event *e) {
     current_state = GestureTracking;
 }
 
-void handle_touch_up_event(libinput_event *e) {
+bool handle_touch_up_event(libinput_event *e, int client_socket) {
     struct libinput_event_touch *touch_event = libinput_event_get_touch_event(e);
     uint32_t slot = libinput_event_touch_get_slot(touch_event);
     active_fingers.erase(slot);
     if (active_fingers.size() == 0) {
         if (current_gesture == CloseWindow) {
             std::cout << "CloseWindow gesture" << '\n';
-            close_window();
+            json msg = {{"event", "close_window"}};
+            return write_client(client_socket, msg.dump());
         } else if (current_gesture == WorkspaceRight) {
             std::cout << "WorkspaceRight gesture" << '\n';
-            workspace_right();
+            json msg = {{"event", "workspace_right"}};
+            return write_client(client_socket, msg.dump());
         } else if (current_gesture == WorkspaceLeft) {
             std::cout << "WorkspaceLeft gesture" << '\n';
-            workspace_left();
+            json msg = {{"event", "workspace_left"}};
+            return write_client(client_socket, msg.dump());
         }
         reset();
     }
+
+    return true;
 }
 
 void handle_gesture() {

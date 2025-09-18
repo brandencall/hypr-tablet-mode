@@ -1,4 +1,4 @@
-#include "utils/hypr_util.h"
+#include "hypr_control/hypr_util.h"
 #include <iostream>
 #include <poll.h>
 
@@ -55,14 +55,8 @@ int execute_hypr_cmd(std::string cmd) {
     return 1;
 }
 
-void close_window() {
-    execute_hypr_cmd("dispatch closewindow");
-}
+void close_window() { execute_hypr_cmd("dispatch closewindow"); }
 
-void workspace_right() {
-    execute_hypr_cmd("dispatch workspace r+1");
-}
+void workspace_right() { execute_hypr_cmd("dispatch workspace r+1"); }
 
-void workspace_left() {
-    execute_hypr_cmd("dispatch workspace r-1");
-}
+void workspace_left() { execute_hypr_cmd("dispatch workspace r-1"); }
