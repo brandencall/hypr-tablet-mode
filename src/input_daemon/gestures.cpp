@@ -38,24 +38,25 @@ bool handle_touch_up_event(libinput_event *e, int client_socket) {
     struct libinput_event_touch *touch_event = libinput_event_get_touch_event(e);
     uint32_t slot = libinput_event_touch_get_slot(touch_event);
     active_fingers.erase(slot);
+    bool successful_write = true;
     if (active_fingers.size() == 0) {
         if (current_gesture == CloseWindow) {
             std::cout << "CloseWindow gesture" << '\n';
             json msg = {{"event", "close_window"}};
-            return write_client(client_socket, msg.dump());
+            successful_write = write_client(client_socket, msg.dump());
         } else if (current_gesture == WorkspaceRight) {
             std::cout << "WorkspaceRight gesture" << '\n';
             json msg = {{"event", "workspace_right"}};
-            return write_client(client_socket, msg.dump());
+            successful_write = write_client(client_socket, msg.dump());
         } else if (current_gesture == WorkspaceLeft) {
             std::cout << "WorkspaceLeft gesture" << '\n';
             json msg = {{"event", "workspace_left"}};
-            return write_client(client_socket, msg.dump());
+            successful_write = write_client(client_socket, msg.dump());
         }
         reset();
     }
 
-    return true;
+    return successful_write;
 }
 
 void handle_gesture() {
