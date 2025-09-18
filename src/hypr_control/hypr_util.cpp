@@ -1,31 +1,13 @@
 #include "hypr_control/hypr_util.h"
-#include <iostream>
-#include <poll.h>
 
-int connect_to_hypr() {
-    const char *xdg = std::getenv("XDG_RUNTIME_DIR");
-    const char *hypr_sig = std::getenv("HYPRLAND_INSTANCE_SIGNATURE");
-    std::string sig = std::string(xdg) + "/hypr/" + std::string(hypr_sig) + "/.socket.sock";
-
-    int fd = socket(AF_UNIX, SOCK_STREAM, 0);
-    if (fd < 0) {
-        perror("socket");
-        return fd;
+void handle_hypr_event(const std::string &event) {
+    if (event == "close_window") {
+        execute_hypr_cmd("dispatch closewindow");
+    } else if (event == "workspace_right") {
+        execute_hypr_cmd("dispatch workspace r+1");
+    } else if (event == "workspace_left") {
+        execute_hypr_cmd("dispatch workspace r-1");
     }
-
-    sockaddr_un addr{};
-    addr.sun_family = AF_UNIX;
-    std::strncpy(addr.sun_path, sig.c_str(), sizeof(addr.sun_path) - 1);
-
-    int connection = connect(fd, (sockaddr *)&addr, sizeof(addr));
-
-    if (connection < 0) {
-        perror("connect");
-        close(fd);
-        return connection;
-    }
-
-    return fd;
 }
 
 int execute_hypr_cmd(std::string cmd) {
@@ -55,8 +37,28 @@ int execute_hypr_cmd(std::string cmd) {
     return 1;
 }
 
-void close_window() { execute_hypr_cmd("dispatch closewindow"); }
+int connect_to_hypr() {
+    const char *xdg = std::getenv("XDG_RUNTIME_DIR");
+    const char *hypr_sig = std::getenv("HYPRLAND_INSTANCE_SIGNATURE");
+    std::string sig = std::string(xdg) + "/hypr/" + std::string(hypr_sig) + "/.socket.sock";
 
-void workspace_right() { execute_hypr_cmd("dispatch workspace r+1"); }
+    int fd = socket(AF_UNIX, SOCK_STREAM, 0);
+    if (fd < 0) {
+        perror("socket");
+        return fd;
+    }
 
-void workspace_left() { execute_hypr_cmd("dispatch workspace r-1"); }
+    sockaddr_un addr{};
+    addr.sun_family = AF_UNIX;
+    std::strncpy(addr.sun_path, sig.c_str(), sizeof(addr.sun_path) - 1);
+
+    int connection = connect(fd, (sockaddr *)&addr, sizeof(addr));
+
+    if (connection < 0) {
+        perror("connect");
+        close(fd);
+        return connection;
+    }
+
+    return fd;
+}

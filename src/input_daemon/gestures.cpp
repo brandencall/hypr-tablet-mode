@@ -42,15 +42,15 @@ bool handle_touch_up_event(libinput_event *e, int client_socket) {
     if (active_fingers.size() == 0) {
         if (current_gesture == CloseWindow) {
             std::cout << "CloseWindow gesture" << '\n';
-            json msg = {{"event", "close_window"}};
+            json msg = {{"type", "hypr"}, {"event", "close_window"}};
             successful_write = write_client(client_socket, msg.dump());
         } else if (current_gesture == WorkspaceRight) {
             std::cout << "WorkspaceRight gesture" << '\n';
-            json msg = {{"event", "workspace_right"}};
+            json msg = {{"type", "hypr"},{"event", "workspace_right"}};
             successful_write = write_client(client_socket, msg.dump());
         } else if (current_gesture == WorkspaceLeft) {
             std::cout << "WorkspaceLeft gesture" << '\n';
-            json msg = {{"event", "workspace_left"}};
+            json msg = {{"type", "hypr"},{"event", "workspace_left"}};
             successful_write = write_client(client_socket, msg.dump());
         }
         reset();
