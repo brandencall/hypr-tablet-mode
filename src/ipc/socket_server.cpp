@@ -1,8 +1,6 @@
 #include "ipc/socket_server.h"
 #include "input_daemon/libinput_util.h"
 #include "input_daemon/sdbus_util.h"
-#include <mutex>
-#include <unordered_map>
 
 std::unordered_map<int, std::mutex> client_mutexes;
 std::mutex map_mutex;
@@ -19,6 +17,20 @@ int create_server_socket() {
     if (bind(server_fd, (sockaddr *)&addr, sizeof(addr)) == -1) {
         perror("bind failed");
         close(server_fd);
+    }
+
+    // TODO: NEED TO CHANGE THIS
+    // change owner to your user
+    struct passwd *pw = getpwnam("brabs");
+    if (pw) {
+        if (chown("/tmp/tablet_ipc.sock", pw->pw_uid, pw->pw_gid) == -1) {
+            perror("chown");
+        }
+    }
+
+    // change permissions so user can read/write
+    if (chmod("/tmp/tablet_ipc.sock", 0660) == -1) {
+        perror("chmod");
     }
     listen(server_fd, 5);
 
