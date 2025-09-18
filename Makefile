@@ -17,7 +17,6 @@ HYPR_CONTROL_DIR = hypr_control
 DAEMON_TARGET = $(BIN_DIR)/input_daemon
 HYPR_TARGET = $(BIN_DIR)/hypr_control
 
-
 # Sources
 IPC_SRCS = $(shell find $(SRC_DIR)/$(IPC_DIR) -name '*.cpp')
 DAEMON_SRCS = $(shell find $(SRC_DIR)/$(INPUT_DAEMON_DIR) -name '*.cpp') 
@@ -33,10 +32,10 @@ DEPS = $(OBJECTS:.o=.d)
 all: $(DAEMON_TARGET) $(HYPR_TARGET)
 
 $(DAEMON_TARGET): $(DAEMON_OBJ) $(IPC_OBJ) | $(BIN_DIR)
-	$(CXX) $^ $(DAEMON_OBJ) $(LDFLAGS) -o $@
+	$(CXX) $^ $(LDFLAGS) -o $@
 
-$(HYPR_TARGET): $(HYPR_OBJ) $(IPC_OBJ) | $(BIN_DIR)
-	$(CXX) $^ $(HYPR_OBJ) $(LDFLAGS) -o $@
+$(HYPR_TARGET): $(HYPR_OBJ) $(IPC_OBJ) $(filter-out obj/input_daemon/input_daemon.o,$(DAEMON_OBJ)) | $(BIN_DIR)
+	$(CXX) $^ $(LDFLAGS) -o $@
 
 # Compilation rules
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
