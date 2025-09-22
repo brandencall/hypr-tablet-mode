@@ -1,9 +1,12 @@
 #include "input_daemon/sdbus_util.h"
+#include "ipc/socket_server.h"
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
 
 static int property_changed_handler(sd_bus_message *m, void *userdata, sd_bus_error *ret_error) {
+    Context *ctx = static_cast<Context *>(userdata);
+    int client_socket = ctx->client_socket;
     const char *interface;
     int r;
 
@@ -39,6 +42,10 @@ static int property_changed_handler(sd_bus_message *m, void *userdata, sd_bus_er
 
             // TODO: implement the ipc socket write for orientation change
             printf("Orientation changed: %s\n", orientation);
+            json msg = {{"type", "tablet"}, {"event", orientation}};
+            if (!write_client(client_socket, msg.dump())) {
+                std::cout << "failed to write to client" << '\n';
+            }
         } else {
             // Skip other properties
             r = sd_bus_message_skip(m, "v");
@@ -53,10 +60,12 @@ static int property_changed_handler(sd_bus_message *m, void *userdata, sd_bus_er
     return 0;
 }
 
-SDBusWrapper sdbus_init_accel_orient() {
+SDBusWrapper sdbus_init_accel_orient(int client_socket) {
     sd_bus *bus = NULL;
     sd_bus_slot *slot = NULL;
     int r;
+
+    Context *ctx = new Context{client_socket};
 
     // Connect to the system bus
     r = sd_bus_open_system(&bus);
@@ -82,15 +91,15 @@ SDBusWrapper sdbus_init_accel_orient() {
                             "/net/hadess/SensorProxy",         // Object path
                             "org.freedesktop.DBus.Properties", // Interface
                             "PropertiesChanged",               // Member
-                            property_changed_handler, NULL);
+                            property_changed_handler, ctx);
     if (r < 0) {
         std::cerr << "Failed to add match" << '\n';
     }
     return {bus, slot};
 }
 
-void sdbus_start_processing_thread(sd_bus *bus) {
-    while (true) {
+void sdbus_start_processing_thread(sd_bus *bus, std::atomic<bool> *sdbus_running) {
+    while (sdbus_running->load()) {
         int r = sd_bus_process(bus, NULL);
         // TODO: what to do if sd_bus process fails
         if (r < 0) {
@@ -98,7 +107,7 @@ void sdbus_start_processing_thread(sd_bus *bus) {
             break;
         }
         if (r == 0) {
-            sd_bus_wait(bus, (uint64_t)-1);
+            sd_bus_wait(bus, 200 * 1000 * 1000);
         }
     }
 }

@@ -1,6 +1,7 @@
 #include "ipc/socket_server.h"
 #include "input_daemon/libinput_util.h"
 #include "input_daemon/sdbus_util.h"
+#include <atomic>
 #include <cstdio>
 #include <iostream>
 
@@ -46,8 +47,9 @@ void client_session(int client_socket) {
 
     LibinputContextWrapper libinput_ctx = libinput_init();
     // Start the sdbus thread
-    auto dbus_ctx = sdbus_init_accel_orient();
-    std::thread dbus_thread(sdbus_start_processing_thread, dbus_ctx.bus);
+    std::atomic<bool> sdbus_running{true};
+    auto dbus_ctx = sdbus_init_accel_orient(client_socket);
+    std::thread dbus_thread(sdbus_start_processing_thread, dbus_ctx.bus, &sdbus_running);
     dbus_thread.detach();
 
     struct pollfd fds[2];
@@ -80,6 +82,8 @@ void client_session(int client_socket) {
 
     close(client_socket);
     libinput_cleanup(libinput_ctx);
+
+    sdbus_running.store(false);
     sdbus_cleanup(dbus_ctx);
 }
 
