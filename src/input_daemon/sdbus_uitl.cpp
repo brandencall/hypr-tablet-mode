@@ -92,8 +92,10 @@ SDBusWrapper sdbus_init_accel_orient() {
 void sdbus_start_processing_thread(sd_bus *bus) {
     while (true) {
         int r = sd_bus_process(bus, NULL);
+        // TODO: what to do if sd_bus process fails
         if (r < 0) {
             std::cerr << "err in the sdbus thread" << '\n';
+            break;
         }
         if (r == 0) {
             sd_bus_wait(bus, (uint64_t)-1);

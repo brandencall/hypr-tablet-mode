@@ -1,9 +1,8 @@
 #include "ipc/socket_server.h"
 #include "input_daemon/libinput_util.h"
 #include "input_daemon/sdbus_util.h"
-
-std::unordered_map<int, std::mutex> client_mutexes;
-std::mutex map_mutex;
+#include <cstdio>
+#include <iostream>
 
 int create_server_socket() {
     const char *SOCKET_PATH = "/tmp/tablet_ipc.sock";
@@ -44,10 +43,6 @@ int create_server_socket() {
 }
 
 void client_session(int client_socket) {
-    {
-        std::lock_guard<std::mutex> lock(map_mutex);
-        client_mutexes[client_socket];
-    }
 
     LibinputContextWrapper libinput_ctx = libinput_init();
     // Start the sdbus thread
@@ -55,24 +50,32 @@ void client_session(int client_socket) {
     std::thread dbus_thread(sdbus_start_processing_thread, dbus_ctx.bus);
     dbus_thread.detach();
 
-    struct pollfd fds;
-    fds.fd = libinput_ctx.fd;
-    fds.events = POLLIN;
+    struct pollfd fds[2];
+    fds[0].fd = client_socket;
+    fds[0].events = POLLIN | POLLHUP | POLLERR;
+    fds[1].fd = libinput_ctx.fd;
+    fds[1].events = POLLIN;
 
-    bool running = true;
-    while (running) {
-        int ret = poll(&fds, 1, -1);
-        if (ret > 0 && (fds.revents & POLLIN)) {
+    while (true) {
+        int ret = poll(fds, 2, -1);
+
+        if (ret < 0) {
+            perror("poll failed");
+            break;
+        }
+
+        if (fds[0].revents & (POLLHUP | POLLERR)) {
+            std::cout << "client disconnected" << '\n';
+            break;
+        }
+
+        if (fds[1].revents & POLLIN) {
             int write_client = libinput_poll(libinput_ctx, client_socket);
             if (write_client <= 0) {
-                running = false;
+                std::cout << "Write to client was <= 0" << '\n';
+                break;
             }
         }
-    }
-
-    {
-        std::lock_guard<std::mutex> lock(map_mutex);
-        client_mutexes.erase(client_socket);
     }
 
     close(client_socket);
@@ -81,7 +84,6 @@ void client_session(int client_socket) {
 }
 
 bool write_client(int client_socket, const std::string &msg) {
-    std::lock_guard<std::mutex> lock(client_mutexes[client_socket]);
     ssize_t n = write(client_socket, msg.c_str(), msg.size());
     if (n < 0) {
         return false;

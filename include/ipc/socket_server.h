@@ -18,6 +18,8 @@
 #include <unistd.h>
 #include <unordered_map>
 
+using json = nlohmann::json;
+
 int create_server_socket();
 void client_session(int client_socket);
 bool write_client(int client_socket, const std::string &msg);

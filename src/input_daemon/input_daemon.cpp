@@ -7,10 +7,11 @@ int main() {
     if (server_socket == -1)
         return -1;
     while (true) {
+        std::cout << "waiting for client to connect" << '\n';
         int client_socket = accept(server_socket, nullptr, nullptr);
-        std::cout << "client connected" << '\n';
         if (client_socket == -1)
             break;
+        std::cout << "client connected" << '\n';
         std::thread(client_session, client_socket).detach();
     }
     close(server_socket);

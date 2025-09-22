@@ -1,8 +1,9 @@
 #include "hypr_control/hypr_util.h"
+#include <iostream>
 
 void handle_hypr_event(const std::string &event) {
     if (event == "close_window") {
-        execute_hypr_cmd("dispatch closewindow");
+        execute_hypr_cmd("dispatch killactive");
     } else if (event == "workspace_right") {
         execute_hypr_cmd("dispatch workspace r+1");
     } else if (event == "workspace_left") {
