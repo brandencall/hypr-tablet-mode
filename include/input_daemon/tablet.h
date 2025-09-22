@@ -4,4 +4,4 @@
 
 using json = nlohmann::json;
 
-bool handle_switch_event(libinput_event *e, int client_socket);
+void handle_switch_event(libinput_event *e, int client_socket);
