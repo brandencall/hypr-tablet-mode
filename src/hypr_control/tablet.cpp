@@ -21,7 +21,6 @@ void enter_tablet_mode() {
     execute_script(script);
 }
 
-// TODO: Need to figure out why tablet mode isn't closing
 void exit_tablet_mode() {
     const char *home = std::getenv("HOME");
     if (!home) {

@@ -27,7 +27,7 @@ struct Finger {
 void reset();
 void handle_touch_down_event(libinput_event *e);
 void handle_touch_motion_event(libinput_event *e);
-bool handle_touch_up_event(libinput_event *e, int client_socket);
+void handle_touch_up_event(libinput_event *e, int client_socket);
 void handle_gesture();
 Vector calculate_motion_vector(const Finger &finger);
 void close_window_gesture();

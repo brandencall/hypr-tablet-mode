@@ -2,26 +2,14 @@
 #include "input_daemon/gestures.h"
 #include "input_daemon/tablet.h"
 
-using HandlerFn = std::function<bool(libinput_event *, int)>;
+using HandlerFn = std::function<void(libinput_event *, int)>;
 
 std::unordered_map<libinput_event_type, HandlerFn> handlers = {
-    {LIBINPUT_EVENT_SWITCH_TOGGLE, [](auto *e, int client_socket) { return handle_switch_event(e, client_socket); }},
-    {LIBINPUT_EVENT_TOUCH_DOWN,
-     [](auto *e, int client_socket) {
-         handle_touch_down_event(e);
-         return true;
-     }},
-    {LIBINPUT_EVENT_TOUCH_MOTION,
-     [](auto *e, int client_socket) {
-         handle_touch_motion_event(e);
-         return true;
-     }},
-    {LIBINPUT_EVENT_TOUCH_UP, [](auto *e, int client_socket) { return handle_touch_up_event(e, client_socket); }},
-    {LIBINPUT_EVENT_TOUCH_FRAME,
-     [](auto *e, int client_socket) {
-         handle_gesture();
-         return true;
-     }},
+    {LIBINPUT_EVENT_SWITCH_TOGGLE, [](auto *e, int client_socket) { handle_switch_event(e, client_socket); }},
+    {LIBINPUT_EVENT_TOUCH_DOWN, [](auto *e, int client_socket) { handle_touch_down_event(e); }},
+    {LIBINPUT_EVENT_TOUCH_MOTION, [](auto *e, int client_socket) { handle_touch_motion_event(e); }},
+    {LIBINPUT_EVENT_TOUCH_UP, [](auto *e, int client_socket) { handle_touch_up_event(e, client_socket); }},
+    {LIBINPUT_EVENT_TOUCH_FRAME, [](auto *e, int client_socket) { handle_gesture(); }},
 };
 
 LibinputContextWrapper libinput_init() {
@@ -40,13 +28,9 @@ int libinput_poll(LibinputContextWrapper &ctx, int client_socket) {
     while ((event = libinput_get_event(ctx.ctx)) != nullptr) {
         auto type = libinput_event_get_type(event);
         if (handlers.find(type) != handlers.end()) {
-            bool ok = handlers[type](event, client_socket);
-            libinput_event_destroy(event);
-            if (!ok)
-                return -1;
-        } else {
-            libinput_event_destroy(event);
+            handlers[type](event, client_socket);
         }
+        libinput_event_destroy(event);
     }
     return 1;
 }

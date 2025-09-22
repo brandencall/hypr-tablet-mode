@@ -34,29 +34,32 @@ void handle_touch_motion_event(libinput_event *e) {
     current_state = GestureTracking;
 }
 
-bool handle_touch_up_event(libinput_event *e, int client_socket) {
+void handle_touch_up_event(libinput_event *e, int client_socket) {
     struct libinput_event_touch *touch_event = libinput_event_get_touch_event(e);
     uint32_t slot = libinput_event_touch_get_slot(touch_event);
     active_fingers.erase(slot);
-    bool successful_write = true;
     if (active_fingers.size() == 0) {
         if (current_gesture == CloseWindow) {
             std::cout << "CloseWindow gesture" << '\n';
             json msg = {{"type", "hypr"}, {"event", "close_window"}};
-            successful_write = write_client(client_socket, msg.dump());
+            if (!write_client(client_socket, msg.dump())) {
+                std::cout << "failed to write to client" << '\n';
+            }
         } else if (current_gesture == WorkspaceRight) {
             std::cout << "WorkspaceRight gesture" << '\n';
-            json msg = {{"type", "hypr"},{"event", "workspace_right"}};
-            successful_write = write_client(client_socket, msg.dump());
+            json msg = {{"type", "hypr"}, {"event", "workspace_right"}};
+            if (!write_client(client_socket, msg.dump())) {
+                std::cout << "failed to write to client" << '\n';
+            }
         } else if (current_gesture == WorkspaceLeft) {
             std::cout << "WorkspaceLeft gesture" << '\n';
-            json msg = {{"type", "hypr"},{"event", "workspace_left"}};
-            successful_write = write_client(client_socket, msg.dump());
+            json msg = {{"type", "hypr"}, {"event", "workspace_left"}};
+            if (!write_client(client_socket, msg.dump())) {
+                std::cout << "failed to write to client" << '\n';
+            }
         }
         reset();
     }
-
-    return successful_write;
 }
 
 void handle_gesture() {
