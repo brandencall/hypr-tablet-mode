@@ -5,6 +5,7 @@
 
 bool tablet_on = false;
 
+//TODO: Add the upside down view
 void handle_tablet_event(const std::string &event) {
     if (event == "tablet_on") {
         enter_tablet_mode();
@@ -20,6 +21,7 @@ void handle_tablet_event(const std::string &event) {
         handle_right_up();
     } else if (event == "normal" && tablet_on) {
         std::cout << "handle normal" << '\n';
+        handle_normal_view();
     }
 }
 
@@ -47,9 +49,38 @@ void exit_tablet_mode() {
     launch_waybar();
 }
 
-void handle_left_up() { execute_hypr_cmd("dispatch rotatemonitor 0 left"); }
+void handle_left_up() {
+    const char *home = std::getenv("HOME");
+    if (!home) {
+        std::cout << "there is no home directory" << '\n';
+        return;
+    }
+    std::filesystem::path script =
+        std::filesystem::path(home) / "projects/hypr-tablet-mode/scripts/rotate_monitor_left.sh";
+    execute_script(script);
+}
 
-void handle_right_up() { execute_hypr_cmd("dispatch rotatemonitor 0 right"); }
+void handle_right_up() {
+    const char *home = std::getenv("HOME");
+    if (!home) {
+        std::cout << "there is no home directory" << '\n';
+        return;
+    }
+    std::filesystem::path script =
+        std::filesystem::path(home) / "projects/hypr-tablet-mode/scripts/rotate_monitor_right.sh";
+    execute_script(script);
+}
+
+void handle_normal_view() {
+    const char *home = std::getenv("HOME");
+    if (!home) {
+        std::cout << "there is no home directory" << '\n';
+        return;
+    }
+    std::filesystem::path script =
+        std::filesystem::path(home) / "projects/hypr-tablet-mode/scripts/rotate_monitor_normal.sh";
+    execute_script(script);
+}
 
 void execute_script(std::filesystem::path script) {
     if (fork() == 0) {

@@ -8,6 +8,7 @@ void enter_tablet_mode();
 void exit_tablet_mode();
 void handle_left_up();
 void handle_right_up();
+void handle_normal_view();
 void execute_script(std::filesystem::path script);
 void kill_waybar();
 void launch_waybar();
