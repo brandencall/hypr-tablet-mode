@@ -9,12 +9,11 @@
 #include <unistd.h>
 #include <unordered_map>
 
-
 static int open_restricted(const char *path, int flags, void *user_data) {
-  int fd = open(path, flags);
-  if (fd < 0)
-    perror("Failed to open device");
-  return fd;
+    int fd = open(path, flags);
+    if (fd < 0)
+        perror("Failed to open device");
+    return fd;
 }
 
 static void close_restricted(int fd, void *user_data) { close(fd); }
@@ -25,8 +24,8 @@ static const struct libinput_interface interface = {
 };
 
 struct LibinputContextWrapper {
-  struct libinput *ctx;
-  int fd;
+    struct libinput *ctx;
+    int fd;
 };
 
 LibinputContextWrapper libinput_init();

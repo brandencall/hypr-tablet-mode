@@ -14,14 +14,14 @@ enum Gesture { None, CloseWindow, WorkspaceRight, WorkspaceLeft };
 enum State { Idle, TouchActive, GestureTracking };
 
 struct Vector {
-  double x, y;
-  double magnitue;
+    double x, y;
+    double magnitue;
 };
 
 struct Finger {
-  double init_x, init_y;
-  double last_x, last_y;
-  Vector vector;
+    double init_x, init_y;
+    double last_x, last_y;
+    Vector vector;
 };
 
 void reset();
