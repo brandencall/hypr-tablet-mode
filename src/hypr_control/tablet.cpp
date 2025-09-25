@@ -5,7 +5,7 @@
 
 bool tablet_on = false;
 
-//TODO: Add the upside down view
+// TODO: Add the upside down view
 void handle_tablet_event(const std::string &event) {
     if (event == "tablet_on") {
         enter_tablet_mode();
@@ -33,19 +33,20 @@ void enter_tablet_mode() {
         return;
     }
 
-    std::filesystem::path script = std::filesystem::path(home) / ".config/eww/launch_dashboard.sh";
-    execute_script(script);
+    std::filesystem::path dashboard = std::filesystem::path(home) / ".config/eww/launch_dashboard.sh";
+    execute_script(dashboard);
     kill_waybar();
 }
 
+// Should probably run the handle_normal_view() script
 void exit_tablet_mode() {
     const char *home = std::getenv("HOME");
     if (!home) {
         std::cout << "there is no home directory" << '\n';
         return;
     }
-    std::filesystem::path script = std::filesystem::path(home) / ".config/eww/close_dashboard.sh";
-    execute_script(script);
+    std::filesystem::path close_dashboard = std::filesystem::path(home) / ".config/eww/close_dashboard.sh";
+    execute_script(close_dashboard);
     launch_waybar();
 }
 
