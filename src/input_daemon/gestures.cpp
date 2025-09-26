@@ -89,8 +89,8 @@ void close_window_gesture() {
 
     Gesture finger_gesture = None;
     for (const auto &finger : active_fingers) {
-        if (finger.second.vector.x > -10 && finger.second.vector.x < 10 && finger.second.vector.y < 0 &&
-            finger.second.vector.magnitue > 30) {
+        if (finger.second.vector.x > -50 && finger.second.vector.x < 50 && finger.second.vector.y < 0 &&
+            finger.second.vector.magnitue > 10) {
             finger_gesture = CloseWindow;
         } else if (current_gesture == CloseWindow) {
             current_gesture = None;
@@ -108,8 +108,8 @@ void workspace_right_gesture() {
 
     Gesture finger_gesture = None;
     for (const auto &finger : active_fingers) {
-        if (finger.second.vector.y > -10 && finger.second.vector.y < 10 && finger.second.vector.x < 0 &&
-            finger.second.vector.magnitue > 30) {
+        if (finger.second.vector.y > -50 && finger.second.vector.y < 50 && finger.second.vector.x < 0 &&
+            finger.second.vector.magnitue > 10) {
             finger_gesture = WorkspaceRight;
         } else if (current_gesture == WorkspaceRight) {
             current_gesture = None;
@@ -127,8 +127,8 @@ void workspace_left_gesture() {
 
     Gesture finger_gesture = None;
     for (const auto &finger : active_fingers) {
-        if (finger.second.vector.y > -10 && finger.second.vector.y < 10 && finger.second.vector.x > 0 &&
-            finger.second.vector.magnitue > 30) {
+        if (finger.second.vector.y > -50 && finger.second.vector.y < 50 && finger.second.vector.x > 0 &&
+            finger.second.vector.magnitue > 10) {
             finger_gesture = WorkspaceLeft;
         } else if (current_gesture == WorkspaceLeft) {
             current_gesture = None;
